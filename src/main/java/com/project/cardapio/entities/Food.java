@@ -8,6 +8,7 @@ import lombok.*;
 
 @Entity(name = "foods")
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
