@@ -19,6 +19,12 @@ public class FoodController {
     @Autowired
     private FoodRepository repository;
 
+    @GetMapping
+    public List<FoodResponseDTO> getAll(){
+        // Para cada 'Food' cria-se um novo 'FoodResponseDTO'
+        return repository.findAll().stream().map(FoodResponseDTO::new).toList();
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     // Limitando acesso
@@ -27,7 +33,6 @@ public class FoodController {
         Food foodData = new Food(data);
         repository.save(foodData);
     }
-
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<FoodRequestDTO> updateFood(@PathVariable Long id, @RequestBody FoodRequestDTO data){
@@ -36,6 +41,7 @@ public class FoodController {
         if(optionalFood.isPresent()){
             Food existingFood = optionalFood.get();
             // Copia os dados de "data" para "existingFood"
+            // Para a cópia funcionar, é necessário os métodos Setters na classe entidade.
             BeanUtils.copyProperties(data, existingFood);
 
             Food foodUpdated = repository.save(existingFood);
@@ -50,9 +56,13 @@ public class FoodController {
         return ResponseEntity.notFound().build();
 
     }
-    @GetMapping
-    public List<FoodResponseDTO> getAll(){
-        // Para cada 'Food' cria-se um novo 'FoodResponseDTO'
-        return repository.findAll().stream().map(FoodResponseDTO::new).toList();
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteFood(@PathVariable Long id){
+        Food existingFood = repository.findById(id).orElseThrow(
+                () -> new IllegalArgumentException("Jogo não encontrado"));
+        repository.deleteById(id);
     }
+
 }
